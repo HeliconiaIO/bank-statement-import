@@ -4,6 +4,7 @@
 # Licence LGPL-3.0 or later (https://www.gnu.org/licenses/lgpl-3.0).
 
 from odoo import api, models
+from odoo.tools.safe_eval import safe_eval
 
 
 class AccountJournal(models.Model):
@@ -42,5 +43,16 @@ class AccountJournal(models.Model):
         action = self.env["ir.actions.actions"]._for_xml_id(
             "account_statement_import_file.account_statement_import_action"
         )
-        action["context"] = {"journal_id": self.id}
+        context = action.get("context", {})
+        if isinstance(context, str):
+            context = safe_eval(context)
+
+        context.update(
+            {
+                "default_journal_id": self.id,
+                "journal_id": self.id,
+            }
+        )
+
+        action["context"] = context
         return action

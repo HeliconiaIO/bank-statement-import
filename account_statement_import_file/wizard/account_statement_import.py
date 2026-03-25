@@ -21,6 +21,14 @@ class AccountStatementImport(models.TransientModel):
         help="Download bank statement files from your bank and upload them here.",
     )
     statement_filename = fields.Char()
+    journal_id = fields.Many2one("account.journal", string="Journal")
+
+    @api.model
+    def default_get(self, fields_list):
+        res = super().default_get(fields_list)
+        if "journal_id" in self.env.context:
+            res["journal_id"] = self.env.context.get("journal_id")
+        return res
 
     def _import_file(self):
         self.ensure_one()
@@ -28,6 +36,8 @@ class AccountStatementImport(models.TransientModel):
             "statement_ids": [],
             "notifications": [],  # list of text messages
         }
+        journal_id = self.env.context.get("journal_id") or self.journal_id.id
+        self = self.with_context(journal_id=journal_id)
         logger.info("Start to import bank statement file %s", self.statement_filename)
         file_data = base64.b64decode(self.statement_file)
         self.import_single_file(file_data, result)
