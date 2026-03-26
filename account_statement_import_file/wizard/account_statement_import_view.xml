@@ -14,14 +14,6 @@
                 <p>Supported formats:</p>
                 <ul id="statement_format">
                     <!-- <li>xxx format</li> is added by format-specific modules -->
-                    <li>Journal:
-                        <field
-                        name="journal_id"
-                        required="1"
-                        domain="[('type', '=', 'bank')]"
-                        readonly="context.get('journal_id')"
-                    />
-                    </li>
                 </ul>
                 <field name="statement_file" filename="statement_filename" />
                 <field name="statement_filename" invisible="1" />
